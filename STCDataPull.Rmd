@@ -1,0 +1,28 @@
+---
+title: "BasicBar"
+author: "Paul Guerra"
+date: "March 18, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(jsonlite)
+library(curl)
+```
+
+```{r}
+crop_s_d <- fromJSON(curl("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/32100013/en", handle = new_handle("useragent" = "Mozilla/5.0")))
+```
+
+
+```{r}
+crop_s_d_data <- read.csv("/Users/pguerra/R learning/ChartPlay/32100013-eng/32100013.csv")
+```
+
+```{r}
+summary(crop_s_d_data)
+```
+
