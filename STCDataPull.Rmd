@@ -14,15 +14,17 @@ library(curl)
 ```
 
 ```{r}
-crop_s_d <- fromJSON(curl("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/32100013/en", handle = new_handle("useragent" = "Mozilla/5.0")))
+crop_s_d_pull <- fromJSON(curl("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/32100013/en", handle = new_handle("useragent" = "Mozilla/5.0")))
 ```
 
 
 ```{r}
-crop_s_d_data <- read.csv("/Users/pguerra/R learning/ChartPlay/32100013-eng/32100013.csv")
+crop_s_d <- read.csv("/Users/pguerra/R learning/ChartPlay/32100013-eng/32100013.csv")
 ```
 
 ```{r}
-summary(crop_s_d_data)
+summary(crop_s_d)
+colnames(crop_s_d)
+crop_s_d
 ```
 
