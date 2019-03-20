@@ -11,20 +11,29 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(jsonlite)
 library(curl)
+library(dplyr)
+```
+## Pull data from the STC website using the table number (in this case national crop supply and disposition 32100013)
+```{r} 
+stc_table_num <- "32100013"
+stc_pull <- fromJSON(curl(sprintf("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/%s/en", stc_table_num)))
+
+temp <- tempfile()
+download.file(stc_pull$object, temp)
+crop_s_d <- read.csv(unz(temp, "32100013.csv"))
+unlink(temp)
+rm(stc_pull)
+
 ```
 
-```{r}
-crop_s_d_pull <- fromJSON(curl("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/32100013/en", handle = new_handle("useragent" = "Mozilla/5.0")))
-```
 
-
+# Make sure the data came in
 ```{r}
-crop_s_d <- read.csv("/Users/pguerra/R learning/ChartPlay/32100013-eng/32100013.csv")
-```
-
-```{r}
-summary(crop_s_d)
 colnames(crop_s_d)
-crop_s_d
+dim(crop_s_d)
+```
+```{r}
+crop_s_d_select <- select(crop_s_d, date = REF_DATE, crop = Type.of.crop, s_d = Supply.and.disposition.of.grains,  VALUE)
+filter(crop_s_d_select, crop %in% c("All wheat", "Canola") & s_d == "Total ending stocks")
 ```
 
