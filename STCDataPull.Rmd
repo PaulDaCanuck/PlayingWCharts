@@ -20,20 +20,32 @@ stc_pull <- fromJSON(curl(sprintf("https://www150.statcan.gc.ca/t1/wds/rest/getF
 
 temp <- tempfile()
 download.file(stc_pull$object, temp)
-crop_s_d <- read.csv(unz(temp, "32100013.csv"))
+stc_data <- read.csv(unz(temp, sprintf("%s.csv", stc_table_num)))
 unlink(temp)
 rm(stc_pull)
 
 ```
 
+# Select the relevant columns from the table and rename
+```{r}
+crop_s_d <- select(stc_data, date = REF_DATE, crop = Type.of.crop, s_d = Supply.and.disposition.of.grains,  VALUE)
 
-# Make sure the data came in
-```{r}
-colnames(crop_s_d)
-dim(crop_s_d)
 ```
+
+# Use unique() to see all the crop types under the crop column
 ```{r}
-crop_s_d_select <- select(crop_s_d, date = REF_DATE, crop = Type.of.crop, s_d = Supply.and.disposition.of.grains,  VALUE)
-filter(crop_s_d_select, crop %in% c("All wheat", "Canola") & s_d == "Total ending stocks")
+crop_types <- unique(crop_s_d$crop)
+
+f_crop_s_d <- filter(crop_s_d, s_d == "Total ending stocks")
+```
+
+# Group by crop type and sum 
+```{r}
+crop_totals <- group_by(f_crop_s_d, crop)
+
+sum_crop_total <- sum(f_crop_s_d$VALUE, na.rm = TRUE)
+sum_croptype_totals <- summarise(crop_totals, crop_vol = sum(VALUE, na.rm = TRUE), crop_proportion = sum(VALUE, na.rm = TRUE) / sum_crop_total)
+sum_croptype_totals
+
 ```
 
